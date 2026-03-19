@@ -264,31 +264,43 @@ const GuideModal = ({ onClose }: { onClose: () => void }) => {
               Ingin mengekspor proyek Anda menjadi aplikasi Windows (.exe) atau Android (.apk)? Gunakan roadmap berikut:
             </p>
             <div className="space-y-3 mt-4">
-              <div className="bg-white/5 p-3 rounded border border-white/10">
-                <strong className="text-blue-400 block mb-1">Desktop EXE (Gampang - Cloud Build via GitHub)</strong>
-                <ol className="list-decimal list-inside text-xs text-gray-400 space-y-2">
-                  <li>Push kode terbaru Anda ke GitHub.</li>
-                  <li>Buka tab <strong>Actions</strong> di GitHub.com.</li>
-                  <li>Pilih workflow <strong>"Build Windows EXE (Tauri)"</strong>.</li>
-                  <li>Download file <strong>.msi</strong> atau <strong>.exe</strong> dari bagian <strong>Artifacts</strong> setelah selesai.</li>
+              <div className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 p-4 rounded-xl border border-blue-500/30">
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles size={16} className="text-blue-400" />
+                  <strong className="text-white text-sm">Official Release (Otomatis & Profesional)</strong>
+                </div>
+                <p className="text-[11px] text-gray-300 mb-3 leading-relaxed">
+                  Ini adalah cara terbaik untuk mempublikasikan aplikasi Anda ke publik. Sistem akan otomatis membangun APK dan EXE, lalu membuat halaman "Release" di GitHub.
+                </p>
+                <ol className="list-decimal list-inside text-xs text-gray-400 space-y-2 mb-3">
+                  <li>Push semua perubahan Anda ke branch <code>main</code>.</li>
+                  <li>Buat sebuah <strong>Tag Versi</strong> baru (misal: <code>v1.0.0</code>).</li>
+                  <li>Push tag tersebut ke GitHub (<code>git push origin v1.0.0</code>).</li>
+                  <li>GitHub Actions akan otomatis membangun versi Windows & Android.</li>
+                  <li>Cek tab <strong>Releases</strong> di halaman depan repositori GitHub Anda.</li>
                 </ol>
-                <p className="text-[10px] text-gray-500 mt-2 italic">Metode ini tidak memerlukan instalasi Rust atau LLVM di komputer Anda.</p>
+                <div className="flex items-center gap-2 text-[10px] text-blue-400 bg-blue-500/10 p-2 rounded-lg">
+                  <Info size={12} />
+                  <span>File APK & Installer Windows akan langsung tersedia di sana selamanya!</span>
+                </div>
               </div>
-              <div className="bg-white/5 p-3 rounded border border-white/10 opacity-60">
-                <strong className="text-gray-400 block mb-1">Desktop EXE (Manual - Lokal)</strong>
-                <p className="text-xs text-gray-400">Jalankan <code>npm run build:tauri</code> jika Anda sudah memiliki Rust Compiler terpasang.</p>
-              </div>
+              
               <div className="bg-white/5 p-3 rounded border border-white/10">
-                <strong className="text-emerald-400 block mb-1">Android APK (Gampang - Cloud Build via GitHub)</strong>
-                <ol className="list-decimal list-inside text-xs text-gray-400 space-y-2">
-                  <li>Hubungkan proyek ke GitHub di tab GitHub.</li>
-                  <li>Lakukan <strong>Commit & Push</strong> perubahan Anda.</li>
-                  <li>Buka repositori Anda di GitHub.com lalu klik tab <strong>Actions</strong>.</li>
-                  <li>Klik pada nama alur kerja (contoh: "Build Android APK") yang sedang berjalan.</li>
-                  <li>Scroll ke bawah ke bagian <strong>Artifacts</strong> setelah statusnya centang hijau.</li>
-                  <li>Klik pada file <strong>aura-ide-android-debug-apk.zip</strong> untuk men-download APK Anda.</li>
+                <strong className="text-blue-400 block mb-1">Desktop EXE (Manual Artifact)</strong>
+                <ol className="list-decimal list-inside text-xs text-gray-400 space-y-1">
+                  <li>Push kode ke GitHub, buka tab <strong>Actions</strong>.</li>
+                  <li>Pilih <strong>"Build Windows EXE (Tauri)"</strong>.</li>
+                  <li>Download dari bagian <strong>Artifacts</strong>.</li>
                 </ol>
-                <p className="text-[10px] text-gray-500 mt-2 italic">Metode ini tidak memerlukan instalasi Android Studio di komputer Anda.</p>
+              </div>
+
+              <div className="bg-white/5 p-3 rounded border border-white/10">
+                <strong className="text-emerald-400 block mb-1">Android APK (Manual Artifact)</strong>
+                <ol className="list-decimal list-inside text-xs text-gray-400 space-y-1">
+                  <li>Push kode ke GitHub, buka tab <strong>Actions</strong>.</li>
+                  <li>Pilih <strong>"Build Android APK"</strong>.</li>
+                  <li>Download dari bagian <strong>Artifacts</strong>.</li>
+                </ol>
               </div>
               <div className="bg-white/5 p-3 rounded border border-white/10 opacity-60">
                 <strong className="text-gray-400 block mb-1">Android APK (Manual - Lokal)</strong>
