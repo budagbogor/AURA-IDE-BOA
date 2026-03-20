@@ -60,6 +60,7 @@ import { getGeminiAI } from './services/geminiService';
 import { FREE_MODELS, generateOpenRouterContent, fetchFreeModels, type OpenRouterModel } from './services/openRouterService';
 import { BYTEZ_MODELS, generateBytezContent } from './services/bytezService';
 import { saveProjectToCloud, loadProjectFromCloud, listCloudProjects } from './services/supabaseService';
+import { fetchUserRepos, cloneRepository, pushProjectToGitHub } from './services/githubService';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 interface McpTemplateArg {
@@ -1140,6 +1141,32 @@ Integrations:
     }
   };
 
+  const handleGithubPush = async () => {
+    if (!githubToken) {
+      alert("GitHub Token belum dikonfigurasi. Silakan ke tab GitHub untuk menghubungkan profil Anda.");
+      setSidebarTab('github');
+      return;
+    }
+    
+    // We suggest the current project name, replacing spaces with dashes for GitHub standards
+    const suggestedName = projectName.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+    const name = prompt("Sebutkan nama repositori GitHub untuk project ini:", suggestedName);
+    
+    if (!name) return;
+
+    setTerminalOutput(prev => [...prev, `[GITHUB] Memulai pengiriman (Push) ${files.length} file ke repositori '${name}'...`]);
+    try {
+      await pushProjectToGitHub(githubToken, name, files, (msg: string) => {
+        setTerminalOutput(prev => [...prev, `[GITHUB] ${msg}`]);
+      });
+      alert("Berhasil mem-push kode ke GitHub!");
+    } catch (err: any) {
+      console.error('GitHub Push Error:', err);
+      setTerminalOutput(prev => [...prev, `[GITHUB ERROR] Gagal push ke GitHub: ${err.message}`]);
+      alert("Gagal mem-push ke GitHub. Silakan periksa koneksi atau token Anda.");
+    }
+  };
+
   const [terminalInput, setTerminalInput] = useState('');
 
   const handleTerminalCommand = async (e: React.KeyboardEvent) => {
@@ -1669,6 +1696,10 @@ Integrations:
                   </button>
                   <button onClick={handleCloudLoad} title="Load from Supabase Cloud" className="hover:text-blue-400 transition-colors">
                     <CloudDownload size={14} />
+                  </button>
+                  <button onClick={handleGithubPush} title="Push Project to GitHub" className="hover:text-[#adbac7] transition-colors relative group">
+                    <Github size={14} />
+                    <div className="absolute -top-1 -right-1 w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
                   </button>
                   <button onClick={closeFolder} title="Close Folder" className="hover:text-red-400 transition-colors">
                     <X size={14} />

@@ -88,3 +88,102 @@ export const cloneRepository = async (token: string, owner: string, repo: string
   
   return files;
 };
+
+export const pushProjectToGitHub = async (token: string, repoName: string, files: any[], onProgress?: (msg: string) => void) => {
+  const client = new Octokit({ auth: token });
+  
+  onProgress?.('Mengautentikasi profil GitHub...');
+  const { data: user } = await client.rest.users.getAuthenticated();
+  const owner = user.login;
+
+  onProgress?.(`Memeriksa repositori ${owner}/${repoName}...`);
+  let repoExists = true;
+  let defaultBranch = 'main';
+  try {
+    const { data: repo } = await client.rest.repos.get({ owner, repo: repoName });
+    defaultBranch = repo.default_branch;
+  } catch (err: any) {
+    if (err.status === 404) {
+      repoExists = false;
+    } else {
+      throw err;
+    }
+  }
+
+  if (!repoExists) {
+    onProgress?.(`Membuat repositori baru (Private): ${repoName}...`);
+    await client.rest.repos.createForAuthenticatedUser({
+      name: repoName,
+      private: true,
+      auto_init: true,
+    });
+    // Beri waktu API GitHub untuk inisialisasi awal
+    await new Promise(resolve => setTimeout(resolve, 2500));
+  }
+
+  onProgress?.('Mengambil referensi branch...');
+  const { data: ref } = await client.rest.git.getRef({
+    owner,
+    repo: repoName,
+    ref: `heads/${defaultBranch}`,
+  });
+  const commitSha = ref.object.sha;
+
+  const { data: commit } = await client.rest.git.getCommit({
+    owner,
+    repo: repoName,
+    commit_sha: commitSha,
+  });
+  const baseTreeSha = commit.tree.sha;
+
+  onProgress?.(`Merakit ${files.length} file ke memori Cloud...`);
+  const treeItems: any[] = [];
+  
+  for (const file of files) {
+    // Pada IDE Aura, file hasil clone menggunakan ID untuk path relatif, namun file baru menggunakan Nama untuk random.
+    const path = file.id && file.id.includes('/') ? file.id : file.name;
+    
+    // Convert string base64 / content safely for GitHub API
+    const { data: blob } = await client.rest.git.createBlob({
+      owner,
+      repo: repoName,
+      content: file.content || '',
+      encoding: 'utf-8',
+    });
+
+    treeItems.push({
+      path: path,
+      mode: '100644',
+      type: 'blob',
+      sha: blob.sha,
+    });
+  }
+
+  onProgress?.('Membangun Git Tree structure...');
+  const { data: newTree } = await client.rest.git.createTree({
+    owner,
+    repo: repoName,
+    base_tree: baseTreeSha,
+    tree: treeItems,
+  });
+
+  onProgress?.('Membuat rilis komit baru...');
+  const { data: newCommit } = await client.rest.git.createCommit({
+    owner,
+    repo: repoName,
+    message: 'chore: Aura IDE Cloud Sync Push',
+    tree: newTree.sha,
+    parents: [commitSha],
+  });
+
+  onProgress?.('Mem-push komit ke branch utama...');
+  await client.rest.git.updateRef({
+    owner,
+    repo: repoName,
+    ref: `heads/${defaultBranch}`,
+    sha: newCommit.sha,
+  });
+
+  onProgress?.('✨ Cloud Push berhasil!');
+  return true;
+};
