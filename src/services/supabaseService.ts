@@ -51,3 +51,46 @@ export const testSupabaseConnection = async (config: SupabaseConfig) => {
     throw new Error(err.message || 'Network error or invalid URL format');
   }
 };
+
+export const saveProjectToCloud = async (config: SupabaseConfig, projectName: string, files: any[]) => {
+  const client = getSupabaseClient(config);
+  if (!client) throw new Error('Supabase client not initialized');
+
+  const { data, error } = await client
+    .from('aura_projects')
+    .upsert({
+      project_name: projectName,
+      files: files,
+    }, { onConflict: 'project_name' })
+    .select();
+
+  if (error) throw new Error(error.message);
+  return data;
+};
+
+export const loadProjectFromCloud = async (config: SupabaseConfig, projectName: string) => {
+  const client = getSupabaseClient(config);
+  if (!client) throw new Error('Supabase client not initialized');
+
+  const { data, error } = await client
+    .from('aura_projects')
+    .select('*')
+    .eq('project_name', projectName)
+    .single();
+
+  if (error) throw new Error(error.message);
+  return data;
+};
+
+export const listCloudProjects = async (config: SupabaseConfig) => {
+  const client = getSupabaseClient(config);
+  if (!client) throw new Error('Supabase client not initialized');
+
+  const { data, error } = await client
+    .from('aura_projects')
+    .select('project_name, created_at')
+    .order('created_at', { ascending: false });
+
+  if (error) throw new Error(error.message);
+  return data;
+};
