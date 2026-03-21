@@ -7,6 +7,7 @@
   ],
   "permissions": [
     "core:default",
+    "shell:allow-spawn",
     "shell:allow-execute",
     "dialog:allow-open",
     "fs:default",
@@ -24,20 +25,34 @@
     "fs:scope-app-recursive",
     "fs:scope-home-recursive",
     "fs:scope-desktop-recursive",
-    "fs:scope-download-recursive",
-    "fs:scope-resource-recursive",
     {
       "identifier": "fs:scope",
       "allow": [{ "path": "**" }]
     },
     {
-      "identifier": "shell:allow-execute",
+      "identifier": "shell:allow-spawn",
       "allow": [
         { "cmd": "npm", "args": true },
+        { "cmd": "npm.cmd", "args": true },
         { "cmd": "git", "args": true },
         { "cmd": "node", "args": true },
         { "cmd": "cmd", "args": true },
-        { "cmd": "powershell", "args": true }
+        { "cmd": "cmd.exe", "args": true },
+        { "cmd": "powershell", "args": true },
+        { "cmd": "powershell.exe", "args": true }
+      ]
+    },
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        { "cmd": "npm", "args": true },
+        { "cmd": "npm.cmd", "args": true },
+        { "cmd": "git", "args": true },
+        { "cmd": "node", "args": true },
+        { "cmd": "cmd", "args": true },
+        { "cmd": "cmd.exe", "args": true },
+        { "cmd": "powershell", "args": true },
+        { "cmd": "powershell.exe", "args": true }
       ]
     }
   ]
