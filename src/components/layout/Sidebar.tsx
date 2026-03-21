@@ -810,7 +810,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             else if (aiProvider === 'bytez') setBytezModel(e.target.value);
                             else setSumopodModel(e.target.value);
                           }}
-                          className="bg-[#3c3c3c] border border-white/10 rounded-lg px-3 py-2 text-[12px] outline-none text-white focus:border-purple-500/50"
+                          className="bg-[#3c3c3c] border border-white/10 rounded-lg px-3 py-2 text-[12px] outline-none text-white focus:border-purple-500/50 w-full"
                         >
                           {aiProvider === 'gemini' && GEMINI_MODELS.map(m => (
                             <option key={m.id} value={m.id}>{m.name}</option>

@@ -14,8 +14,44 @@ export const BYTEZ_MODELS = [
 ];
 
 export const SUMOPOD_MODELS = [
-  { id: 'Llama-3-8B-Instruct', name: 'Llama 3 8B Instruct' },
-  { id: 'Mistral-7B-Instruct-v0.2', name: 'Mistral 7B Instruct' }
+  { id: 'claude-haiku-4-5', name: 'Claude Haiku 4.5' },
+  { id: 'deepseek-r1', name: 'DeepSeek R1 (pencarian mendalam-r1)' },
+  { id: 'deepseek-v3-2', name: 'DeepSeek V3.2' },
+  { id: 'glm-4-7', name: 'GLM 4.7' },
+  { id: 'kimi-k2', name: 'Kimi K2' },
+  { id: 'kimi-k2-5-260127', name: 'Kimi K2.5-260127' },
+  { id: 'kimi-k2-thinking', name: 'Kimi K2 Thinking' },
+  { id: 'seed-1-8', name: 'Seed 1.8 (benih-1-8)' },
+  { id: 'seed-2-0-lite-free', name: 'Seed 2.0 Lite Free' },
+  { id: 'seed-2-0-mini', name: 'Seed 2.0 Mini' },
+  { id: 'seed-2-0-mini-free', name: 'Seed 2.0 Mini Free (gratis)' },
+  { id: 'gemini/gemini-2.0-flash', name: 'Gemini 2.0 Flash' },
+  { id: 'gemini/gemini-2.0-flash-lite', name: 'Gemini 2.0 Flash Lite' },
+  { id: 'gemini/gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
+  { id: 'gemini/gemini-2.5-flash-lite', name: 'Gemini 2.5 Flash Lite' },
+  { id: 'gemini/gemini-2.5-pro', name: 'Gemini 2.5 Pro' },
+  { id: 'gemini/gemini-3-flash-preview', name: 'Gemini 3 Flash Preview' },
+  { id: 'gemini/gemini-3-pro', name: 'Gemini 3 Pro Preview' },
+  { id: 'gpt-4.1', name: 'GPT 4.1' },
+  { id: 'gpt-4.1-mini', name: 'GPT 4.1 Mini' },
+  { id: 'gpt-4.1-nano', name: 'GPT 4.1 Nano' },
+  { id: 'gpt-4o', name: 'GPT 4o' },
+  { id: 'gpt-4o-mini', name: 'GPT 4o Mini' },
+  { id: 'gpt-5', name: 'GPT 5' },
+  { id: 'gpt-5-mini', name: 'GPT 5 Mini' },
+  { id: 'gpt-5-nano', name: 'GPT 5 Nano' },
+  { id: 'gpt-5.1', name: 'GPT 5.1' },
+  { id: 'gpt-5.1-codex', name: 'GPT 5.1 Codex' },
+  { id: 'gpt-5.1-codex-mini', name: 'GPT 5.1 Codex Mini' },
+  { id: 'gpt-5.2', name: 'GPT 5.2' },
+  { id: 'gpt-5.2-codex', name: 'GPT 5.2 Codex' },
+  { id: 'gpt-1-image', name: 'GPT 1 Image (gambar gpt-1)' },
+  { id: 'text-embedding-3-large', name: 'Text Embed 3 Large' },
+  { id: 'text-embedding-3-small', name: 'Text Embed 3 Small' },
+  { id: 'whisper-1', name: 'Whisper 1' },
+  { id: 'glm-5', name: 'GLM 5' },
+  { id: 'glm-5-code', name: 'GLM 5 Code' },
+  { id: 'glm-5-turbo', name: 'GLM 5 Turbo' }
 ];
 
 export const AI_PROVIDERS = [
