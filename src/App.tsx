@@ -192,12 +192,23 @@ export default function App() {
   const [tauriFs, setTauriFs] = useState<any>(null);
   const [nativeProjectPath, setNativeProjectPath] = useState<string | null>(null);
 
+  const activeProcessRef = useRef<any>(null);
+  const [commandHistory, setCommandHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+
   useEffect(() => {
     if (typeof window !== 'undefined' && (window as any).__TAURI_INTERNALS__) {
       import('@tauri-apps/plugin-shell').then(m => { setTauriCommand(() => m.Command); });
       import('@tauri-apps/plugin-dialog').then(m => { setTauriDialog(m); });
       import('@tauri-apps/plugin-fs').then(m => { setTauriFs(m); });
     }
+    
+    // Cleanup active process on unmount
+    return () => {
+      if (activeProcessRef.current) {
+        activeProcessRef.current.kill().catch(() => {});
+      }
+    };
   }, []);
 
   const [files, setFiles] = useState<FileItem[]>([]);
@@ -1230,7 +1241,19 @@ Integrations:
     // If running in Tauri Desktop mode, try real execution
     if (isTauri && TauriCommand && nativeProjectPath) {
       try {
-        const parts = val.split(' ');
+        // Kill existing process if any
+        if (activeProcessRef.current) {
+          try {
+            await activeProcessRef.current.kill();
+          } catch (e) {}
+          activeProcessRef.current = null;
+        }
+
+        // Add to history
+        setCommandHistory(prev => [val, ...prev.filter(h => h !== val)].slice(0, 50));
+        setHistoryIndex(-1);
+
+        const parts = val.trim().split(/\s+/);
         const mainCmd = parts[0];
         const args = parts.slice(1);
 
@@ -1247,16 +1270,19 @@ Integrations:
           ).spawn();
         }
 
+        activeProcessRef.current = child;
+
         child.stdout.on('data', (line: string) => {
-          if (line && line.trim()) appendOutput(line);
+          if (line) appendOutput(line);
         });
 
         child.stderr.on('data', (line: string) => {
-          if (line && line.trim()) appendOutput(`[ERR] ${line}`);
+          if (line) appendOutput(`[ERR] ${line}`);
         });
 
         child.on('close', (data: { code: number | null }) => {
           const code = data?.code;
+          activeProcessRef.current = null;
           if (code === 0) {
             appendOutput(`✓ Selesai (exit code: 0)`);
           } else if (code !== null) {
@@ -1270,6 +1296,7 @@ Integrations:
         appendOutput(`[SYSTEM ERROR] ${err?.message || 'Gagal menjalankan perintah native.'}`);
         appendOutput(`[DEBUG] CWD: ${nativeProjectPath}`);
         appendOutput(`[DEBUG] CMD: ${val}`);
+        activeProcessRef.current = null;
       }
     } else {
       // Fallback Simulator (only if not in native mode or no folder open)
@@ -1756,6 +1783,9 @@ Integrations:
         isScanning={isScanning}
         scanForProblems={scanForProblems}
         nativeProjectPath={nativeProjectPath}
+        commandHistory={commandHistory}
+        historyIndex={historyIndex}
+        setHistoryIndex={setHistoryIndex}
       />
 
       </div>

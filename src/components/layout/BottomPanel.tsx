@@ -23,6 +23,9 @@ interface BottomPanelProps {
   isScanning: boolean;
   scanForProblems: () => void;
   nativeProjectPath: string | null;
+  commandHistory: string[];
+  historyIndex: number;
+  setHistoryIndex: (index: number) => void;
 }
 
 export const BottomPanel: React.FC<BottomPanelProps> = ({
@@ -44,7 +47,10 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
   activeFile,
   isScanning,
   scanForProblems,
-  nativeProjectPath
+  nativeProjectPath,
+  commandHistory,
+  historyIndex,
+  setHistoryIndex
 }) => {
   const currentSession = terminalSessions.find(s => s.id === activeTerminalId) || terminalSessions[0];
   const displayPath = nativeProjectPath ? (nativeProjectPath.split(/[\\/]/).pop() || nativeProjectPath) : 'aura-project';
@@ -128,8 +134,34 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
               <input 
                  type="text" 
                  value={terminalInput}
-                 onChange={(e) => setTerminalInput(e.target.value)}
-                 onKeyDown={handleTerminalCommand}
+                 onChange={(e) => {
+                   setTerminalInput(e.target.value);
+                   if (historyIndex === -1) {
+                     // Reset history if user starts typing manually
+                   }
+                 }}
+                 onKeyDown={(e) => {
+                   if (e.key === 'ArrowUp') {
+                     e.preventDefault();
+                     if (commandHistory.length > 0 && historyIndex < commandHistory.length - 1) {
+                       const newIndex = historyIndex + 1;
+                       setHistoryIndex(newIndex);
+                       setTerminalInput(commandHistory[newIndex]);
+                     }
+                   } else if (e.key === 'ArrowDown') {
+                     e.preventDefault();
+                     if (historyIndex > 0) {
+                       const newIndex = historyIndex - 1;
+                       setHistoryIndex(newIndex);
+                       setTerminalInput(commandHistory[newIndex]);
+                     } else if (historyIndex === 0) {
+                       setHistoryIndex(-1);
+                       setTerminalInput('');
+                     }
+                   } else {
+                     handleTerminalCommand(e);
+                   }
+                 }}
                  className="flex-1 bg-transparent border-none outline-none text-white font-mono placeholder:text-gray-700/50"
                  placeholder="type command..."
                  autoFocus
