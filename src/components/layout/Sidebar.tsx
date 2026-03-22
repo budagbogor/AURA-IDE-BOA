@@ -500,7 +500,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       }
                     });
                     setActiveFileId(path);
-                    appendTerminalOutput(`[AI] Perubahan diterapkan pada: ${path}`);
                   }}
                 />
               </motion.div>

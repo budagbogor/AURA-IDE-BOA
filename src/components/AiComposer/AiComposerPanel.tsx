@@ -80,6 +80,13 @@ export const AiComposerPanel: React.FC<AiComposerPanelProps> = ({
             return newMessages;
           });
           lastUpdateTime = now;
+
+          // Real-time zero click apply
+          const blockRegex = /\`\`\`(?:file|delete):([^\n]+)\n([\s\S]*?)(?:\`\`\`|$)/g;
+          let match;
+          while ((match = blockRegex.exec(fullResponse)) !== null) {
+            onApplyCode(match[1].trim(), match[2]);
+          }
         }
       }
 
@@ -90,17 +97,17 @@ export const AiComposerPanel: React.FC<AiComposerPanelProps> = ({
         return newMessages;
       });
 
-      // After stream finished, parse for files
-      const parsedFiles = parseComposerResponse(fullResponse);
-      
-      setMessages(prev => {
-        const newMessages = [...prev];
-        newMessages[newMessages.length - 1].parsedFiles = parsedFiles;
-        return newMessages;
-      });
+      // Final Apply Code
+      const finalRegex = /\`\`\`(?:file|delete):([^\n]+)\n([\s\S]*?)(?:\`\`\`|$)/g;
+      let finalMatch;
+      let fileCount = 0;
+      while ((finalMatch = finalRegex.exec(fullResponse)) !== null) {
+        onApplyCode(finalMatch[1].trim(), finalMatch[2]);
+        fileCount++;
+      }
 
-      if (parsedFiles.length > 0 && appendTerminalOutput) {
-        appendTerminalOutput(`[AI] Menyelesaikan generasi kode untuk ${parsedFiles.length} file.`);
+      if (fileCount > 0 && appendTerminalOutput) {
+        appendTerminalOutput(`[AI ZERO-CLICK] Otomatis membuat/mengedit ${fileCount} file di Editor.`);
       }
 
     } catch (error: any) {
@@ -137,37 +144,35 @@ export const AiComposerPanel: React.FC<AiComposerPanelProps> = ({
                 : "bg-[#252526] border border-white/10 text-gray-200 rounded-tl-none"
             )}>
               <div className="prose prose-invert prose-sm max-w-none">
-                <Markdown>{msg.content}</Markdown>
+                <Markdown
+                  components={{
+                    code({ node, inline, className, children, ...props }: any) {
+                      const match = /language-(file|delete):([^\n]+)/.exec(className || '');
+                      if (!inline && match) {
+                        return (
+                          <div className="my-3 p-3 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs flex items-center justify-between gap-3 shadow-sm backdrop-blur-sm">
+                            <span className="flex items-center gap-2 font-mono break-all">
+                              <span className="opacity-50 text-blue-300">File:</span> 
+                              <b>{match[2].trim()}</b>
+                            </span>
+                            <span className="flex items-center gap-1.5 px-2 py-1 rounded bg-blue-500/20 text-blue-300 font-bold uppercase tracking-wider text-[9px] animate-pulse whitespace-nowrap">
+                              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shadow-[0_0_5px_rgba(96,165,250,0.8)]" />
+                              Sedang Di Tulis...
+                            </span>
+                          </div>
+                        );
+                      }
+                      return (
+                        <code className={className} {...props}>
+                          {children}
+                        </code>
+                      );
+                    }
+                  }}
+                >
+                  {msg.content}
+                </Markdown>
               </div>
-              
-              {/* Render Code Blocks for Ai to Apply */}
-              {msg.parsedFiles && msg.parsedFiles.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-white/10">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-[11px] font-bold uppercase tracking-widest text-[#bbbbbb]">
-                      Suggested Changes ({msg.parsedFiles.length})
-                    </h4>
-                    <button 
-                      onClick={() => {
-                        msg.parsedFiles?.forEach(file => onApplyCode(file.path, file.content));
-                      }}
-                      className="text-[9px] bg-green-600/20 text-green-400 hover:bg-green-600/40 px-2 py-1.5 rounded transition-all uppercase tracking-wider font-bold border border-green-500/30"
-                    >
-                      Accept All
-                    </button>
-                  </div>
-                  {msg.parsedFiles.map((file, i) => (
-                    <CodeBlockPreview
-                      key={i}
-                      filePath={file.path}
-                      content={file.content}
-                      action={file.action}
-                      onAccept={(path, content) => onApplyCode(path, content)}
-                      onReject={() => {}}
-                    />
-                  ))}
-                </div>
-              )}
             </div>
           </div>
         ))}
