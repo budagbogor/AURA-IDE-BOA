@@ -6,6 +6,7 @@ import { cn } from '@/utils/cn';
 import { getFileIcon } from '@/utils/icons';
 import { AuraLogo } from '@/components/layout/AuraLogo';
 import { FileItem } from '@/types';
+import { WorkflowDiagram } from '@/components/features/WorkflowDiagram';
 
 interface EditorAreaProps {
   files: FileItem[];
@@ -126,6 +127,9 @@ export const EditorArea: React.FC<EditorAreaProps> = ({
             <div className="flex items-center gap-1.5"><kbd className="bg-[#333] px-1.5 py-0.5 rounded border border-white/10 text-white">Ctrl+P</kbd> Search Files</div>
             <div className="flex items-center gap-1.5"><kbd className="bg-[#333] px-1.5 py-0.5 rounded border border-white/10 text-white">Ctrl+Shift+P</kbd> Commands</div>
           </div>
+
+          {/* Workflow Diagram Section */}
+          <WorkflowDiagram />
         </div>
       )}
       
