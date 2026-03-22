@@ -42,7 +42,13 @@ export async function generateGeminiContent(apiKey: string, prompt: string, cont
   return response.text;
 }
 
-export async function* generateGeminiStream(apiKey: string, model: string, prompt: string, attachments: any[] = []) {
+export async function* generateGeminiStream(
+  apiKey: string, 
+  model: string, 
+  prompt: string, 
+  attachments: any[] = [],
+  chatHistory: { role: string; content: string }[] = []
+) {
   const ai = getGeminiAI(apiKey);
   
   const contentParts: any[] = [{ text: prompt }];
@@ -59,9 +65,17 @@ export async function* generateGeminiStream(apiKey: string, model: string, promp
     }
   });
 
+  const formattedHistory = chatHistory.map(msg => ({
+    role: msg.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: msg.content }]
+  }));
+
   const result = await ai.models.generateContentStream({
     model: model || "gemini-2.0-flash",
-    contents: [{ role: "user", parts: contentParts }],
+    contents: [...formattedHistory, { role: "user", parts: contentParts }],
+    config: {
+      maxOutputTokens: 16384,
+    }
   });
 
   for await (const chunk of result) {

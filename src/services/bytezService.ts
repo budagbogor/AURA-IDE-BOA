@@ -10,12 +10,25 @@ export const BYTEZ_MODELS: BytezModel[] = [
   { id: "deepseek-ai/DeepSeek-R1", name: "DeepSeek R1 (Bytez)" },
 ];
 
-export async function generateBytezContent(model: string, prompt: string, bytezKey: string, googleKey: string, attachments: any[] = []) {
+export async function generateBytezContent(
+  model: string, 
+  prompt: string, 
+  bytezKey: string, 
+  googleKey: string, 
+  attachments: any[] = [],
+  chatHistory: { role: string; content: string }[] = []
+) {
   if (!bytezKey) {
     throw new Error("Bytez API Key is required.");
   }
 
+  const formattedHistory = chatHistory.map(msg => ({
+    role: msg.role === 'assistant' ? 'assistant' : 'user',
+    content: msg.content
+  }));
+
   const messages: any[] = [
+    ...formattedHistory,
     { role: "user", content: prompt }
   ];
 
@@ -34,7 +47,7 @@ export async function generateBytezContent(model: string, prompt: string, bytezK
       stream: false, // Start with non-streaming for simplicity
       params: {
         temperature: 0.7,
-        max_length: 2048
+        max_length: 16384
       }
     })
   });

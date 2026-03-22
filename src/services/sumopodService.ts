@@ -22,7 +22,7 @@ export async function generateSumopodContent(
       model,
       messages,
       temperature: options.temperature ?? 0.7,
-      max_tokens: options.max_tokens ?? 4096, // Increased for 2026 models
+      max_tokens: options.max_tokens ?? 16384, // Increased for 2026 models with massive context limit
     }),
   });
 

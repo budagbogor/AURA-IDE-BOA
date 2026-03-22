@@ -942,7 +942,7 @@ Integrations:
         
         let fullResponse = '';
         try {
-          const stream = generateGeminiStream(apiKey, selectedModel, prompt, attachedFiles);
+          const stream = generateGeminiStream(apiKey, selectedModel, prompt, attachedFiles, chatMessages);
           for await (const chunk of stream) {
             fullResponse += chunk;
             setChatMessages(prev => {
@@ -961,7 +961,7 @@ Integrations:
         }
       } else if (aiProvider === 'bytez') {
         const googleKey = geminiApiKey || process.env.GEMINI_API_KEY || '';
-        content = await generateBytezContent(bytezModel, prompt, bytezApiKey, googleKey, attachedFiles);
+        content = await generateBytezContent(bytezModel, prompt, bytezApiKey, googleKey, attachedFiles, chatMessages);
         setChatMessages(prev => [...prev, { role: 'assistant', content: content }]);
       } else if (aiProvider === 'sumopod') {
         if (!sumopodApiKey) throw new Error('SumoPod API Key is required. Please set it in Settings.');
@@ -974,7 +974,7 @@ Integrations:
       } else {
         const apiKey = openRouterApiKey || process.env.OPENROUTER_API_KEY || '';
         if (!apiKey) throw new Error('OpenRouter API Key is missing. Please set it in Settings.');
-        content = await generateOpenRouterContent(openRouterModel, prompt, apiKey, attachedFiles);
+        content = await generateOpenRouterContent(openRouterModel, prompt, apiKey, attachedFiles, chatMessages);
         setChatMessages(prev => [...prev, { role: 'assistant', content: content }]);
       }
 

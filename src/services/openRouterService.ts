@@ -37,7 +37,13 @@ export async function fetchFreeModels(): Promise<OpenRouterModel[]> {
   }
 }
 
-export async function generateOpenRouterContent(model: string, prompt: string, apiKey: string, attachments: any[] = []) {
+export async function generateOpenRouterContent(
+  model: string, 
+  prompt: string, 
+  apiKey: string, 
+  attachments: any[] = [],
+  chatHistory: { role: string; content: string }[] = []
+) {
   let targetModel = model;
   
   if (model === "auto-free") {
@@ -62,6 +68,11 @@ export async function generateOpenRouterContent(model: string, prompt: string, a
     }
   });
 
+  const formattedHistory = chatHistory.map(msg => ({
+    role: msg.role === 'assistant' ? 'assistant' : 'user',
+    content: msg.content
+  }));
+
   const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -73,6 +84,7 @@ export async function generateOpenRouterContent(model: string, prompt: string, a
     body: JSON.stringify({
       model: targetModel,
       messages: [
+        ...formattedHistory,
         { role: "user", content: contentParts }
       ]
     })
